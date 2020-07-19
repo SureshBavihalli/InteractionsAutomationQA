@@ -4,13 +4,15 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.HashMap;
 import java.util.Iterator;
 
 
 
 public class ExcelUtils {
-    
+    static  int rowCount=0;
+   
     public static final String SAMPLE_XLSX_FILE_PATH = "./convertcsv.xlsx";
 
     public static void readExcel(Root res) throws IOException, InvalidFormatException {
@@ -43,7 +45,7 @@ public class ExcelUtils {
         // Use a for-each loop to iterate over the rows and columns
         System.out.println("\n\nIterating over Rows and Columns using for-each loop\n");
 
-        
+           
         	int colCOunt =  sheet.getRow(0).getLastCellNum();
         	System.out.println("Number of rows in a sheet: "+sheet.getLastRowNum());
         	System.out.println("Number of columns in a sheet:  "+colCOunt);
@@ -59,20 +61,34 @@ public class ExcelUtils {
         	}
 
         		int flag = 0;
-			//we got row data now, lets check this data with our response. for witch index it match!
+        		String[][] values = new String[100][50];
+			    //we got row data now, lets check this data with our response. for witch index it match!
         		for (int resIndex = 0; resIndex < res.getList().size(); resIndex++) {
         			
             		//If to check index in respose..used two params to check and also printing in loop.
             		if(excelData.get("main/temp").equals(String.valueOf(res.getList().get(resIndex).getMain().getTemp()))&&
             				excelData.get("wind/speed").equals(String.valueOf(res.getList().get(resIndex).getWind().getSpeed()))	) {
-							System.out.println("Expected      |       Actual");
+							
+            			
+            			    //Print in console
+            				System.out.println("Expected      |       Actual");
 							System.out.println("--------------------------------");
 							System.out.println(excelData.get("main/temp")+"            "+res.getList().get(resIndex).getMain().getTemp());
 							System.out.println(excelData.get("clouds/all")+"                 "+res.getList().get(resIndex).getClouds().getAll());
 							System.out.println(excelData.get("wind/speed")+"              "+res.getList().get(resIndex).getWind().getSpeed());
 							System.out.println(excelData.get("weather/0/id")+"              "+res.getList().get(resIndex).getWeather().get(0).getId());
 							System.out.println(excelData.get("weather/0/main")+"             "+res.getList().get(resIndex).getWeather().get(0).getMain());
-						 flag = 1;
+						 
+							
+							//Write to excel - Results.xlsx located in project folder!
+							WriteOutput.write(excelData.get("main/temp"), Double.toString(res.getList().get(resIndex).getMain().getTemp()));   
+							WriteOutput.write(excelData.get("clouds/all"), Double.toString(res.getList().get(resIndex).getClouds().getAll()));
+							WriteOutput.write(excelData.get("wind/speed"), Double.toString(res.getList().get(resIndex).getWind().getSpeed()));
+							WriteOutput.write(excelData.get("weather/0/id"), Double.toString(res.getList().get(resIndex).getWeather().get(0).getId()));
+							WriteOutput.write(excelData.get("weather/0/main"), res.getList().get(resIndex).getWeather().get(0).getMain());
+							 
+						 
+							flag = 1;
             			
             		}
 
@@ -84,14 +100,16 @@ public class ExcelUtils {
 				   
         		}
             		
+        		
             	
-        		excelData.clear();//for next iteration
+        		//excelData.clear();//for next iteration
         		 
                 flag =0; //for next iteration
 	
 			}
+        	
         // Closing the workbook
-        workbook.close();
+       // workbook.close();
     }
 
 	
